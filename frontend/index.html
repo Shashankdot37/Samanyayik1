@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samanyayik - Legal Excellence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#ffffff', // White
+            secondary: '#166534', // Green-800 (Deep Green for professionalism)
+            secondaryLight: '#dcfce7', // Green-100
+            textMain: '#000000',
+          },
+          fontFamily: {
+            sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+            serif: ['"Playfair Display"', 'serif'],
+          },
+          spacing: {
+            '128': '32rem',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            },
+            fadeInUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'fade-in-up': 'fadeInUp 0.5s ease-out',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: "Playfair Display", serif;
+    }
+
+    /* High Contrast Mode Overrides */
+    .high-contrast {
+      background-color: #000000 !important;
+      color: #ffff00 !important;
+    }
+
+    .high-contrast * {
+      background-color: #000000 !important;
+      color: #ffff00 !important;
+      border-color: #ffff00 !important;
+    }
+
+    .high-contrast img {
+      filter: grayscale(100%) contrast(150%);
+    }
+
+    .high-contrast button {
+      border: 2px solid #ffff00 !important;
+    }
+
+    /* Dyslexic Font */
+    .dyslexic-font * {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', sans-serif !important;
+      letter-spacing: 0.05em;
+    }
+
+    /* Underline Links */
+    .underline-links a {
+      text-decoration: underline !important;
+      text-decoration-thickness: 2px !important;
+    }
+
+    /* Bold Text */
+    .bold-text * {
+      font-weight: bold !important;
+    }
+
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -100px;
+      left: 0;
+      background: #166534;
+      /* secondary */
+      color: white;
+      padding: 8px;
+      z-index: 100;
+      transition: top 0.2s;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+  </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.6",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
+  }
+}
+</script>
+  <link rel="stylesheet" href="/index.css">
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>
