@@ -853,52 +853,9 @@ export const SERVICE_CATEGORIES_NP: ServiceCategory[] = [
   }
 ];
 
-export const TEAM_MEMBERS_NP: TeamMember[] = [
-  {
-    id: 1,
-    name: "अधिवक्ता रमेश कार्की",
-    position: "वरिष्ठ साझेदार",
-    expertise: "फौजदारी कानून र मुद्दा",
-    description: "नेपालको सर्वोच्च अदालतमा २५ वर्षभन्दा बढीको अनुभवका साथ, अधिवक्ता कार्कीले धेरै हाई-प्रोफाइल मुद्दाहरूमा सफाइ हासिल गरेका छन्। उनी आफ्नो तीक्ष्ण जिरह कौशल र फौजदारी न्यायशास्त्रको गहिरो बुझाइका लागि परिचित छन्।",
-    image: "https://picsum.photos/400/400?random=100",
-    phone: "+९७७-९८६१२९२१२०",
-    email: "ramesh.karki@samanyayik.com",
-    socials: { linkedin: "#", twitter: "#" }
-  },
-  {
-    id: 2,
-    name: "अधिवक्ता अन्जली श्रेष्ठ",
-    position: "प्रबन्ध साझेदार",
-    expertise: "कर्पोरेट र व्यापारिक कानून",
-    description: "अन्जली कर्पोरेट सुशासन, मर्जर, र प्रत्यक्ष वैदेशिक लगानीमा विशेषज्ञता राख्छिन्। उनी नेपालमा सञ्चालित धेरै बहुराष्ट्रिय निगमहरूको कानूनी सल्लाहकारको रूपमा सेवा गर्छिन्, सहज अनुपालन र रणनीतिक वृद्धि सुनिश्चित गर्दै।",
-    image: "https://picsum.photos/400/400?random=101",
-    phone: "+९७७-९८६५२४५४१०",
-    email: "anjali.shrestha@samanyayik.com",
-    socials: { linkedin: "#", facebook: "#" }
-  },
-  {
-    id: 3,
-    name: "अधिवक्ता बिनोद थापा",
-    position: "एसोसिएट अधिवक्ता",
-    expertise: "घरजग्गा र सम्पत्ति कानून",
-    description: "बिनोद सम्पत्ति विवाद र जग्गा अधिग्रहणका लागि जाने विशेषज्ञ हुन्। उनको ड्यू डिलिजेन्स प्रक्रियाहरूमा विस्तृत ध्यानले ग्राहकहरूलाई लाखौंको सम्भावित दायित्वहरूबाट बचाएको छ।",
-    image: "https://picsum.photos/400/400?random=102",
-    phone: "+९७७-९८४१००००००",
-    email: "binod.thapa@samanyayik.com",
-    socials: { twitter: "#", facebook: "#" }
-  },
-  {
-    id: 4,
-    name: "अधिवक्ता सरिता गुरुङ",
-    position: "वरिष्ठ एसोसिएट",
-    expertise: "पारिवारिक कानून र मानव अधिकार",
-    description: "मानव अधिकारका लागि एक भावुक वकिल, सरिता संवेदनशील पारिवारिक कानूनका मुद्दाहरूलाई करुणाका साथ ह्यान्डल गर्छिन्। उनले जटिल सम्बन्ध विच्छेद र बच्चाको संरक्षण लडाइहरूमा ग्राहकहरूको सफलतापूर्वक प्रतिनिधित्व गरेकी छिन्।",
-    image: "https://picsum.photos/400/400?random=103",
-    phone: "+९७७-९८५१००००००",
-    email: "sarita.gurung@samanyayik.com",
-    socials: { linkedin: "#" }
-  }
-];
+
+
+
 
 export const FAQ_ITEMS_NP: FAQItem[] = [
   // Section 1: General & About Us
@@ -1020,8 +977,101 @@ export const TESTIMONIALS_NP = [
   }
 ];
 
-export const ALBUM_IMAGES = [];
-export const TEAM_MEMBERS = [];
+export const TEAM_MEMBERS: TeamMember[] = [
+  {
+    name: "Advocate Jiwan Kumar Acharya",
+    position: "Managing Director",
+    description:
+      "Advocate Jiwan is a human rights lawyer with strong advocacy for social justice for marginalized, underrepresented, and disadvantaged communities in Nepal. He has profound expertise in international human rights law and has contributed to drafting declarations for the EU NGO Forum presented before the OHCHR and the Global Disability Summit. Along with human rights issues, he also oversees legal matters including litigation and defense in adjudicatory bodies.",
+    workingArea:
+      "Human Rights Law, Criminal Law, Constitutional Law, Labor Law, Disability Law, Family Law, Property Law, Environmental Law, Public Interest Litigation, Legal Research, Analysis, and Policy Drafting.",
+    image: "/assets/team/jiwan_kumar_acharya.png",
+    phoneNumber: "+977-9861292120",
+    email: "jiwanacharya.sagar@gmail.com"
+  },
+  {
+    name: "Advocate Susma Dhakal",
+    position: "Research Associate",
+    description:
+      "Advocate Susma Dhakal serves as a Research Associate with specialized focus on corporate, civil, and criminal law, alongside human rights and constitutional advocacy. She is committed to advancing legal frameworks that promote justice and inclusion. She manages the firm’s research initiatives while actively engaging in litigation related to civil, economic, social, and cultural rights.",
+    workingArea:
+      "Company Law, Insurance Law, Banking Law, Civil Law, Criminal Law, Human Rights, Constitutional Law, Legal Research, Analysis, and Policy Drafting.",
+    image: "/assets/team/susma_dhakal.png",
+    phoneNumber: "+977-9865245410",
+    email: "susmadhakal1234@gmail.com"
+  },
+  {
+    name: "Sandip Thapa",
+    position: "Research Assistant",
+    description:
+      "Sandip Thapa is a founding member and Research Assistant of the company. He is a freelance writer and translator whose insightful articles on socio-legal issues have been featured in national publications including Kantipur Daily, Naya Patrika, and Himal Khabar.",
+    workingArea:
+      "Corporate Law, Human Rights Law, Human Rights Advocacy, Disability Law, SOGIESC Rights, Inclusive and Special Needs Education Policy, Translation, Legal Research, Analysis, and Policy Drafting.",
+    image: "/assets/team/sandip_thapa.png",
+    phoneNumber: "+977-9867757912",
+    email: "lafasandip15@gmail.com"
+  },
+  {
+    name: "Alaka Wagle",
+    position: "Research Assistant",
+    description:
+      "Alaka Wagle is a founding member and Research Assistant with a strong interest in human rights, social justice, and environmental justice. She actively participates in national seminars and civic movements, applying feminist legal theory to analyze policies from a gender perspective. She also has a strong professional interest in corporate sectors, particularly banking and insurance law.",
+    workingArea:
+      "Corporate Law, Business Management, Environmental Justice, Feminist Legal Theory, Legal Research, and Policy Drafting.",
+    image: "/assets/team/alaka_wagle.png",
+    phoneNumber: "+977-9865031557",
+    email: "alakawagle2@gmail.com"
+  }
+];
+
+export const TEAM_MEMBERS_NP: TeamMember[] = [
+  {
+    name: "अधिवक्ता जीवन कुमार आचार्य",
+    position: "प्रबन्ध निर्देशक",
+    description:
+      "अधिवक्ता जीवन मानवअधिकारका लागि समर्पित एक अनुभवी कानुन व्यवसायी हुन्। उनी वञ्चित, उपेक्षित, तथा जोखिममा परेका समुदायहरूको हकहितमा लामो समयदेखि वकालत गर्दै आएका छन्। अन्तर्राष्ट्रिय मानवअधिकार कानुनमा गहिरो दखल भएका उनले EU NGO Forum मार्फत OHCHR र Global Disability Summit मा प्रस्तुत गरिएका घोषणापत्रको मस्यौदामा महत्वपूर्ण योगदान गरेका छन्। साथै, उनी विभिन्न कानुनी विवाद, मुद्दा–बहस, र न्यायिक निकायहरूमा प्रतिरक्षा सम्बन्धी कार्यहरू पनि सम्हाल्छन्।",
+    workingArea:
+      "मानव अधिकार कानून, फौजदारी कानून, संविधान कानून, श्रम कानून, अपांगता अधिकार, परिवार कानून, जग्गा/सम्पत्ति कानून, वातावरणीय कानून, सार्वजनिक सरोकार मुद्दा, कानुनी अनुसन्धान, विश्लेषण, र नीतिनिर्माण",
+    image: "/assets/team/jiwan_kumar_acharya.png",
+    phoneNumber: "+९७७-९८६१२९२१२०",
+    email: "jiwanacharya.sagar@gmail.com"
+  },
+  {
+    name: "अधिवक्ता सुस्मा ढकाल",
+    position: "अनुसन्धान सहयोगी",
+    description:
+      "अधिवक्ता सुस्मा ढकाल कर्पोरेट, दिवानी, र फौजदारी कानुनमा विशेष रुचि राख्ने एक सक्षम अनुसन्धानकर्ता हुन्। मानव अधिकार र संविधान सम्बन्धी कानुनी वकालतमा सक्रिय रहँदै, उनले संस्थाका अनुसन्धान परियोजनाहरू संयोजन गर्छिन् र आर्थिक, सामाजिक, सांस्कृतिक अधिकारसम्बन्धी मुद्दाहरूमा प्रभावकारी कानुनी प्रतिनिधित्व प्रदान गर्दै आएकी छन्।",
+    workingArea:
+      "कम्पनी कानून, बीमा कानून, बैंकिङ कानून, दिवानी कानून, फौजदारी कानून, मानव अधिकार, संविधान कानून, कानुनी अनुसन्धान, विश्लेषण, र नीतिनिर्माण",
+    image: "/assets/team/susma_dhakal.png",
+    phoneNumber: "+९७७-९८६५२४५४१०",
+    email: "susmadhakal1234@gmail.com"
+  },
+  {
+    name: "सन्दीप थापा",
+    position: "अनुसन्धान सहायक",
+    description:
+      "सन्दीप थापा संस्थाका संस्थापक सदस्य तथा अनुसन्धान सहायक हुन्। उनी एक फ्रीलान्स लेखक तथा अनुवादक हुन् जसका सामाजिक–कानुनी विषयमा आधारित लेखहरू कान्तिपुर दैनिक, नयाँ पत्रिका, र हिमाल खबरजस्ता प्रतिष्ठित पत्रपत्रिकामा प्रकाशित भएका छन्।",
+    workingArea:
+      "कर्पोरेट कानून, मानव अधिकार कानून, मानव अधिकार अभिवकालत, अपांगता अधिकार, SOGIESC अधिकार, समावेशी तथा विशेष आवश्यकता शिक्षा नीति, अनुवाद, कानुनी अनुसन्धान, विश्लेषण, र नीतिनिर्माण",
+    image: "/assets/team/sandip_thapa.png",
+    phoneNumber: "+९७७-९८६७७५७९१२",
+    email: "lafasandip15@gmail.com"
+  },
+  {
+    name: "अलका वाग्ले",
+    position: "अनुसन्धान सहायक",
+    description:
+      "अलका वाग्ले एक संस्थापक सदस्य तथा अनुसन्धान सहायक हुन्। उनी मानव अधिकार, सामाजिक न्याय, र वातावरणीय न्यायका विषयमा विशेष रुचि राख्छिन्। उनले विभिन्न राष्ट्रिय सेमिनार, छलफल, र नागरिक आन्दोलनहरूमा सक्रिय सहभागिता जनाउँदै, नारीवादी कानुनी दृष्टिकोणबाट नीतिगत विषयहरूको विश्लेषण गर्छिन्। साथै, बैंकिङ र बीमा क्षेत्रप्रति उनको पेशागत रुचि उल्लेखनीय छ।",
+    workingArea:
+      "कर्पोरेट कानून, व्यवसाय प्रवन्धन, वातावरणीय न्याय, नारीवादी कानुनी सिद्धान्त, कानुनी अनुसन्धान, र नीतिनिर्माण",
+    image: "/assets/team/alaka_wagle.png",
+    phoneNumber: "+९७७-९८६५०३१५५७",
+    email: "alakawagle2@gmail.com"
+  }
+];
+
+
 
 export const NEWS_ITEMS: NewsItem[] = [
   {

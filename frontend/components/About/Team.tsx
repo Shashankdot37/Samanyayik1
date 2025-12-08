@@ -1,11 +1,8 @@
-
-
 import React, { useState } from 'react';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { TRANSLATIONS, TEAM_MEMBERS, TEAM_MEMBERS_NP } from '../../constants';
 import { TeamMember } from '../../types';
 import { Modal } from '../Shared/Modal';
-import { Facebook, Linkedin, Twitter, Mail, Phone, X } from 'lucide-react';
 
 export const Team: React.FC = () => {
   const { language } = useAccessibility();
@@ -20,9 +17,9 @@ export const Team: React.FC = () => {
         <h2 className="text-4xl font-serif font-bold text-center mb-16 text-black">{t.ourTeamTitle}</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {members.map((member) => (
+          {members.map((member, index) => (
             <div 
-              key={member.id} 
+              key={index} 
               className="flex flex-col items-center cursor-pointer group"
               onClick={() => setSelectedMember(member)}
               role="button"
@@ -40,7 +37,7 @@ export const Team: React.FC = () => {
               </div>
               
               <h3 className="text-xl font-bold text-black mb-1 text-center group-hover:text-secondary transition-colors">{member.name}</h3>
-              <p className="text-sm font-bold text-gray-600 text-center uppercase tracking-wide">{member.expertise}</p>
+              <p className="text-sm font-bold text-gray-600 text-center uppercase tracking-wide">{member.workingArea}</p>
             </div>
           ))}
         </div>
@@ -70,36 +67,18 @@ export const Team: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <div className="flex items-center text-black font-bold">
-                            <span className="w-24 text-gray-500 font-normal">Expertise:</span>
-                            {selectedMember.expertise}
+                        <div className="flex items-start text-black font-bold">
+                            <span className="w-24 text-gray-500 font-normal">Working Areas:</span>
+                            <span className="flex-1">{selectedMember.workingArea}</span>
                         </div>
                         <div className="flex items-center text-black font-bold">
                             <span className="w-24 text-gray-500 font-normal">{t.phoneLabel}:</span>
-                            <a href={`tel:${selectedMember.phone}`} className="hover:text-secondary">{selectedMember.phone}</a>
+                            <a href={`tel:${selectedMember.phoneNumber}`} className="hover:text-secondary">{selectedMember.phoneNumber}</a>
                         </div>
                          <div className="flex items-center text-black font-bold">
                             <span className="w-24 text-gray-500 font-normal">{t.emailLabel}:</span>
                             <a href={`mailto:${selectedMember.email}`} className="hover:text-secondary">{selectedMember.email}</a>
                         </div>
-                    </div>
-
-                    <div className="flex gap-4 pt-4">
-                        {selectedMember.socials.linkedin && (
-                            <a href={selectedMember.socials.linkedin} className="p-2 bg-gray-100 rounded-full hover:bg-secondary hover:text-white transition-colors">
-                                <Linkedin className="w-5 h-5" />
-                            </a>
-                        )}
-                        {selectedMember.socials.twitter && (
-                            <a href={selectedMember.socials.twitter} className="p-2 bg-gray-100 rounded-full hover:bg-secondary hover:text-white transition-colors">
-                                <Twitter className="w-5 h-5" />
-                            </a>
-                        )}
-                        {selectedMember.socials.facebook && (
-                             <a href={selectedMember.socials.facebook} className="p-2 bg-gray-100 rounded-full hover:bg-secondary hover:text-white transition-colors">
-                                <Facebook className="w-5 h-5" />
-                            </a>
-                        )}
                     </div>
                 </div>
             </div>

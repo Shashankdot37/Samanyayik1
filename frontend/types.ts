@@ -194,20 +194,15 @@ export interface Article {
 }
 
 export interface TeamMember {
-  id: number;
   name: string;
   position: string;
-  expertise: string;
   description: string;
-  image: string;
-  phone: string;
+  workingArea: string;
+  phoneNumber: string;
   email: string;
-  socials: {
-    facebook?: string;
-    linkedin?: string;
-    twitter?: string;
-  };
+  image: string;
 }
+
 
 export type NewsCategory = 'News' | 'Legal Commentary' | 'Blog';
 
