@@ -3,23 +3,52 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { TRANSLATIONS, TESTIMONIALS } from '../../constants';
 import { Quote, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { fetchAPI, flattenStrapiResponse, extractTextFromBlocks } from '../../utils/api';
+import { Testimonial, StrapiTestimonial } from '../../types';
 
 export const Testimonials: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(TESTIMONIALS);
+
 
   // If only 1 testimonial, don't play
-  const shouldAnimate = TESTIMONIALS.length > 1;
+  const shouldAnimate = testimonials.length > 1;
 
   const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % TESTIMONIALS.length);
-  }, []);
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+  }, [testimonials.length]);
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length);
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
+
+  useEffect(() => {
+     const loadTestimonials = async () => {
+       try {
+         const data = await fetchAPI<any>('/api/testimonials');
+         const strapiItems = flattenStrapiResponse<StrapiTestimonial>(data);
+         
+         if (strapiItems.length > 0) {
+            const mappedItems: Testimonial[] = strapiItems.map(item => {
+               const isNepali = language === 'np';
+               return {
+                   id: item.id,
+                   name: isNepali ? (item.name_np || item.name_en) : item.name_en,
+                   role: isNepali ? (item.role_np || item.role_en) : item.role_en,
+                   text: extractTextFromBlocks(isNepali ? (item.testimonial_np || item.testimonial_en) : item.testimonial_en)
+               };
+            });
+            setTestimonials(mappedItems);
+         }
+       } catch (error) {
+         console.error("Failed to load testimonials", error);
+       }
+     };
+     loadTestimonials();
+  }, [language]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -34,7 +63,7 @@ export const Testimonials: React.FC = () => {
     if (e.key === 'ArrowRight') nextSlide();
   };
 
-  if (TESTIMONIALS.length === 0) return null;
+  if (testimonials.length === 0) return null;
 
   return (
     <section 
@@ -70,16 +99,16 @@ export const Testimonials: React.FC = () => {
                     key={currentIndex} // Triggers animation on change
                 >
                     <p className="text-xl md:text-2xl font-sans font-normal text-gray-900 mb-8 leading-relaxed">
-                        "{TESTIMONIALS[currentIndex].text}"
+                        "{testimonials[currentIndex].text}"
                     </p>
                     
                     <div className="flex flex-col items-center">
                         <div className="w-12 h-1 bg-secondary mb-4 rounded-full"></div>
                         <h3 className="text-2xl font-serif font-bold text-black mb-1">
-                            {TESTIMONIALS[currentIndex].name}
+                            {testimonials[currentIndex].name}
                         </h3>
                         <p className="text-sm font-sans font-bold text-secondary uppercase tracking-widest">
-                            {TESTIMONIALS[currentIndex].role}
+                            {testimonials[currentIndex].role}
                         </p>
                     </div>
                 </div>
@@ -116,7 +145,7 @@ export const Testimonials: React.FC = () => {
 
                     {/* Indicators */}
                     <div className="flex justify-center mt-8 space-x-2">
-                        {TESTIMONIALS.map((_, index) => (
+                        {testimonials.map((_, index) => (
                             <button
                                 key={index}
                                 onClick={() => setCurrentIndex(index)}

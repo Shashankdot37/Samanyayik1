@@ -362,3 +362,32 @@ export interface StrapiPublication {
 export interface APINewsItem extends Omit<NewsItem, 'image'> {
   image: string | StrapiImage;
 }
+
+export interface StrapiTestimonial {
+  id: number;
+  documentId: string;
+  name_en: string;
+  name_np: string;
+  role_en: string;
+  role_np: string;
+  testimonial_en: StrapiTextBlock[];
+  testimonial_np: StrapiTextBlock[];
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiProject {
+  id: number;
+  documentId: string;
+  title_en: string;
+  title_np: string;
+  client_en: string;
+  client_np: string;
+  description_en: string;
+  description_np: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}

@@ -7,12 +7,43 @@ import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { Modal } from '../Shared/Modal';
 import { Button } from '../UI/Button';
 import { Briefcase, ListPlus, FolderGit2 } from 'lucide-react';
+import { fetchAPI, flattenStrapiResponse } from '../../utils/api';
+import { Project, StrapiProject } from '../../types';
 
 export const PastProjects: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const projects = language === 'np' ? PAST_PROJECTS_NP : PAST_PROJECTS;
+  // const projects = language === 'np' ? PAST_PROJECTS_NP : PAST_PROJECTS;
+  const [projects, setProjects] = useState<Project[]>(language === 'np' ? PAST_PROJECTS_NP : PAST_PROJECTS);
+
+  React.useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await fetchAPI<any>('/api/projects');
+        const strapiItems = flattenStrapiResponse<StrapiProject>(data);
+
+        if (strapiItems.length > 0) {
+          const mappedItems: Project[] = strapiItems.map(item => {
+             const isNepali = language === 'np';
+             return {
+                 id: item.id,
+                 title: isNepali ? (item.title_np || item.title_en) : item.title_en,
+                 client: isNepali ? (item.client_np || item.client_en) : item.client_en,
+                 description: isNepali ? (item.description_np || item.description_en) : item.description_en
+             };
+          });
+          setProjects(mappedItems);
+        } else {
+             setProjects(language === 'np' ? PAST_PROJECTS_NP : PAST_PROJECTS);
+        }
+      } catch (error) {
+        console.error("Failed to load projects", error);
+        setProjects(language === 'np' ? PAST_PROJECTS_NP : PAST_PROJECTS);
+      }
+    };
+    loadProjects();
+  }, [language]);
 
   // Show first 2 projects upfront
   const featuredProjects = projects.slice(0, 2);

@@ -30,11 +30,19 @@ export async function fetchAPI<T>(
     options: RequestInit = {}
 ): Promise<T> {
     // Merge default and user options
+    const headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+    };
+
+    if (options.body instanceof FormData) {
+        // Let browser set Content-Type with boundary for FormData
+        delete (headers as any)['Content-Type'];
+    }
+
     const mergedOptions = {
-        headers: {
-            'Content-Type': 'application/json',
-        },
         ...options,
+        headers,
     };
 
     // Build request URL

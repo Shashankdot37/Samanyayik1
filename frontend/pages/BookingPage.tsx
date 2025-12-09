@@ -98,23 +98,129 @@ const BookingPage: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      setIsSuccess(true);
-      setTimeout(() => {
-        // Reset or Redirect logic here
-        // console.log("Booking Confirmed", { selectedDate, selectedTime, form });
-      }, 2000);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [mimeType, setMimeType] = useState<string>('audio/webm');
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      // Stop recording
+      mediaRecorder?.stop();
+      setIsRecording(false);
+    } else {
+      // Start recording
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // Detect supported mime type
+        let selectedMimeType = 'audio/webm';
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            selectedMimeType = 'audio/webm;codecs=opus';
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+            selectedMimeType = 'audio/mp4'; // Safari
+        }
+        
+        setMimeType(selectedMimeType);
+        const recorder = new MediaRecorder(stream, { mimeType: selectedMimeType });
+        const chunks: Blob[] = [];
+
+        recorder.ondataavailable = (e) => {
+          if (e.data.size > 0) chunks.push(e.data);
+        };
+
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: selectedMimeType });
+          console.log("Recording stopped. Blob size:", blob.size, "Type:", selectedMimeType);
+          setAudioBlob(blob);
+          setHasVoiceMessage(true);
+          // Stop all tracks to release microphone
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        recorder.start();
+        setMediaRecorder(recorder);
+        setIsRecording(true);
+        setAudioChunks([]);
+        setAudioBlob(null); // Reset previous recording
+      } catch (err) {
+        console.error("Error accessing microphone:", err);
+        alert("Could not access microphone. Please check permissions.");
+      }
     }
   };
 
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-    // Stub for actual MediaRecorder logic
-    if (isRecording) {
-        // Stop recording
-        setHasVoiceMessage(true); // Assume success for stub
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm() && selectedDate && selectedTime) {
+      try {
+        let voiceMessageId = null;
+
+        // Step 1: Upload Voice Message (if exists)
+        if (audioBlob) {
+            const uploadData = new FormData();
+            // Using .wav extension to bypass strict validation if needed
+            // Strapi /api/upload expects 'files' key
+            uploadData.append('files', audioBlob, 'voice_message.wav'); 
+
+            const uploadResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:1337'}/api/upload`, {
+                method: 'POST',
+                body: uploadData,
+            });
+
+            if (!uploadResponse.ok) {
+                const uploadError = await uploadResponse.json();
+                console.error("Upload Error:", uploadError);
+                throw new Error(`Voice message upload failed: ${uploadError.error?.message || uploadResponse.statusText}`);
+            }
+
+            const uploadResult = await uploadResponse.json();
+            // Strapi returns an array of files for the upload endpoint
+            if (Array.isArray(uploadResult) && uploadResult.length > 0) {
+                voiceMessageId = uploadResult[0].id;
+            } else {
+                 // Fallback if structure is different
+                 voiceMessageId = uploadResult.id; 
+            }
+        }
+
+        // Step 2: Create Appointment (JSON)
+        const requestData: any = {
+          date: selectedDate, 
+          time: selectedTime, 
+          name: form.name,
+          phone: form.phone,
+          consultationType: form.consultationType,
+          email: form.email || null, 
+          address: form.address,
+          coordinates: form.coordinates ? { lat: form.coordinates[0], lng: form.coordinates[1] } : null,
+          issue: form.issue ? [{ type: 'paragraph', children: [{ type: 'text', text: form.issue }] }] : null,
+        };
+
+        // Attach the media relationship
+        if (voiceMessageId) {
+            requestData.voiceMessage = voiceMessageId;
+        }
+
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:1337'}/api/appointments`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ data: requestData }),
+        });
+
+        if (!response.ok) {
+           const errorData = await response.json();
+           console.error("Server Error Details:", errorData);
+           throw new Error(`Failed to submit booking: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+        }
+        
+        setIsSuccess(true);
+      } catch (error) {
+        console.error("Submission Error:", error);
+        alert(`Failed to submit booking. Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     }
   };
 
