@@ -3,15 +3,52 @@
 
 
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapPin, Phone, Mail, Facebook, Twitter, Scale, Youtube, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
-import { TRANSLATIONS } from '../../constants';
+import { TRANSLATIONS, PRIVACY_POLICY, ACCESSIBILITY_POLICY } from '../../constants';
 
 export const Footer: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showAccessibility, setShowAccessibility] = useState(false);
+
+  // Lock background scroll when a modal is open
+  useEffect(() => {
+    const open = showPrivacy || showAccessibility;
+    const original = document.body.style.overflow;
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = original || '';
+    }
+    return () => {
+      document.body.style.overflow = original || '';
+    };
+  }, [showPrivacy, showAccessibility]);
+
+  const renderModal = (title: string, html: string, onClose: () => void) => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[85vh] text-gray-900 flex flex-col">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-800 transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-6 overflow-y-auto prose prose-sm max-w-none text-gray-900 flex-1">
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
@@ -93,11 +130,14 @@ export const Footer: React.FC = () => {
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>&copy; {new Date().getFullYear()} {t.footerRights}</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
-            <Link to="/accessibility" className="hover:text-white">Accessibility</Link>
+            <button onClick={() => setShowPrivacy(true)} className="hover:text-white transition-colors">Privacy Policy</button>
+            <button onClick={() => setShowAccessibility(true)} className="hover:text-white transition-colors">Accessibility</button>
           </div>
         </div>
       </div>
+
+      {showPrivacy && renderModal('Privacy Policy', PRIVACY_POLICY, () => setShowPrivacy(false))}
+      {showAccessibility && renderModal('Accessibility Statement', ACCESSIBILITY_POLICY, () => setShowAccessibility(false))}
     </footer>
   );
 };
