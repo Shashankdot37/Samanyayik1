@@ -53,7 +53,7 @@ export const Mission: React.FC = () => {
         {/* Right: Image */}
         <div className="w-full md:w-1/2 h-[600px] relative rounded-2xl overflow-hidden shadow-2xl">
             <img 
-              src="/assets/missiogroupn-image.jpg" 
+              src="/assets/mission-image.jpg" 
               alt="A close-up of a wooden judge’s gavel, centered against a dark background, highlighting its polished texture and cylindrical head." 
               className="w-full h-full object-cover"
             />
