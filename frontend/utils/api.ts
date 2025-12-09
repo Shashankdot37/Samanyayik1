@@ -1,36 +1,28 @@
+/// <reference types="vite/client" />
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:1337';
 
-export interface StrapiMeta {
-    pagination: {
-        page: number;
-        pageSize: number;
-        pageCount: number;
-        total: number;
-    };
-}
+// =======================================
+// API BASE URL
+// =======================================
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:1337";
 
-export interface StrapiResponse<T> {
-    data: T;
-    meta: StrapiMeta;
-}
-
-export interface StrapiDataItem<T> {
-    id: number;
-    attributes: T;
-}
-
-export interface StrapiData<T> {
-    data: StrapiDataItem<T>[];
-    meta: StrapiMeta;
+/**
+ * Helper to build query string
+ * @param params Object of key-value pairs
+ * @returns Query string
+ */
+export function buildQuery(params: Record<string, any> = {}): string {
+    return Object.keys(params)
+        .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+        .join('&');
 }
 
 /**
- * Helper to fetch data from Strapi API
- * @param path The API endpoint path (e.g. '/api/notices')
- * @param urlParamsObject Object containing query parameters
- * @param options Fetch options
- * @returns Promise with the data
+ * Helper to make GET requests to API endpoints
+ * @param path The path of the API endpoint (e.g. '/news')
+ * @param urlParamsObject URL parameters object, will be stringified
+ * @param options Options passed to fetch
+ * @returns Parsed JSON response
  */
 export async function fetchAPI<T>(
     path: string,
@@ -46,16 +38,16 @@ export async function fetchAPI<T>(
     };
 
     // Build request URL
-    const queryString = Object.keys(urlParamsObject)
-        .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(urlParamsObject[key])}`)
-        .join('&');
-
+    const queryString = buildQuery(urlParamsObject);
     const requestUrl = `${API_URL}${path}${queryString ? `?${queryString}` : ''}`;
 
     try {
         const response = await fetch(requestUrl, mergedOptions);
+        if (!response.ok) {
+            throw new Error(`An error occurred while fetching the data: ${response.statusText}`);
+        }
         const data = await response.json();
-        return data;
+        return data; // Strapi returns { data: [...], meta: {...} }
     } catch (error) {
         console.error(`Error fetching data from ${path}:`, error);
         throw error;
@@ -63,27 +55,24 @@ export async function fetchAPI<T>(
 }
 
 /**
- * Helper to flatten Strapi response
- * Strapi v4 returns { data: [{ id, attributes: { ... } }] }
- * This converts it to [{ id, ...attributes }]
+ * Helper to extract text from Strapi Rich Text Block
+ * This is a basic implementation to get string content from blocks
  */
-export function flattenStrapiResponse<T>(data: any): T[] {
-    if (!data || !data.data) return [];
+export function extractTextFromBlocks(blocks: any[]): string {
+    if (!Array.isArray(blocks)) return '';
 
-    if (Array.isArray(data.data)) {
-        return data.data.map((item: any) => ({
-            id: item.id,
-            ...item.attributes,
-        }));
+    return blocks.map(block => {
+        if (block.type === 'paragraph' || block.type === 'heading') {
+            return block.children?.map((child: any) => child.text).join('') || '';
+        }
+        return '';
+    }).join('\n\n');
+}
+
+// Helper to handle the response format if needed (though the provided format is flat in data)
+export function flattenStrapiResponse<T>(res: any): T[] {
+    if (res?.data && Array.isArray(res.data)) {
+        return res.data;
     }
-
-    // Single item
-    if (data.data && data.data.attributes) {
-        return [{
-            id: data.data.id,
-            ...data.data.attributes
-        }] as any;
-    }
-
     return [];
 }

@@ -2,18 +2,49 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { TRANSLATIONS, ACHIEVEMENT_CASES, ACHIEVEMENT_CASES_NP } from '../../constants';
+import { AchievementCase, StrapiAchievement } from '../../types';
 import { Trophy, Scale, AlertTriangle, Gavel, CheckCircle2, ListPlus } from 'lucide-react';
 import { Button } from '../UI/Button';
 import { Modal } from '../Shared/Modal';
+import { fetchAPI, flattenStrapiResponse, extractTextFromBlocks } from '../../utils/api';
 
 export const Achievements: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const cases = language === 'np' ? ACHIEVEMENT_CASES_NP : ACHIEVEMENT_CASES;
+  // const cases = language === 'np' ? ACHIEVEMENT_CASES_NP : ACHIEVEMENT_CASES;
+  const [cases, setCases] = useState<AchievementCase[]>(language === 'np' ? ACHIEVEMENT_CASES_NP : ACHIEVEMENT_CASES);
+
+  useEffect(() => {
+    const loadAchievements = async () => {
+        try {
+            const response = await fetchAPI<any>('/api/achievements');
+            const strapiItems = flattenStrapiResponse<StrapiAchievement>(response);
+
+            if (strapiItems.length > 0) {
+                const mappedItems: AchievementCase[] = strapiItems.map(item => {
+                    const isNepali = language === 'np';
+                    return {
+                        id: item.id,
+                        title: isNepali ? (item.title_np || item.title_en) : item.title_en,
+                        caseTitle: isNepali ? (item.case_title_np || item.case_title_en) : item.case_title_en,
+                        challenge: extractTextFromBlocks(isNepali ? item.challenge_np : item.challenge_en),
+                        action: extractTextFromBlocks(isNepali ? item.action_np : item.action_en),
+                        outcome: extractTextFromBlocks(isNepali ? item.outcome_np : item.outcome_en)
+                    };
+                });
+                setCases(mappedItems);
+            }
+        } catch (error) {
+            console.error("Failed to load achievements from API, using static data", error);
+            setCases(language === 'np' ? ACHIEVEMENT_CASES_NP : ACHIEVEMENT_CASES);
+        }
+    };
+    loadAchievements();
+  }, [language]);
 
   // Show first 2 achievements upfront
   const featuredCases = cases.slice(0, 2);

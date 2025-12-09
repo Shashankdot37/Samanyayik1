@@ -279,6 +279,86 @@ export interface APINoticeItem extends NoticeItem {
   // Add any specific API fields if different
 }
 
+// Basic Strapi Logic for Rich Text
+interface StrapiTextBlock {
+  type: string;
+  children: { type: string; text: string }[];
+}
+
+export interface StrapiNewsItem {
+  id: number;
+  documentId: string;
+  category: NewsCategory;
+  date: string;
+  slug: string;
+  title_en: string;
+  description_en: string;
+  author_en: string;
+  content_en: StrapiTextBlock[];
+  title_np: string;
+  description_np: string;
+  author_np: string;
+  content_np: StrapiTextBlock[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiNoticeItem {
+  id: number;
+  documentId: string;
+  category: Exclude<NoticeCategory, 'All'>;
+  date: string;
+  isUrgent: boolean;
+  slug: string;
+  title_en: string;
+  excerpt_en: string;
+  content_en: StrapiTextBlock[];
+  title_np: string;
+  excerpt_np: string;
+  content_np: StrapiTextBlock[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiAchievement {
+  id: number;
+  documentId: string;
+  title_en: string;
+  title_np: string;
+  case_title_en: string;
+  case_title_np: string;
+  challenge_en: StrapiTextBlock[];
+  challenge_np: StrapiTextBlock[];
+  action_en: StrapiTextBlock[];
+  action_np: StrapiTextBlock[];
+  outcome_en: StrapiTextBlock[];
+  outcome_np: StrapiTextBlock[];
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
+export interface StrapiPublication {
+  id: number;
+  documentId: string;
+  title_en: string;
+  title_np: string;
+  author_en: string;
+  author_np: string;
+  description_en: string;
+  description_np: string;
+  date: string;
+  type: string; // "pdf" | "link" | etc from API
+  external_url: string | null;
+  size: string | null;
+  slug: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 export interface APINewsItem extends Omit<NewsItem, 'image'> {
   image: string | StrapiImage;
 }

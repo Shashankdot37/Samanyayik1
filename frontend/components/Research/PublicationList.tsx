@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PUBLICATIONS, TRANSLATIONS } from '../../constants';
-import { Publication, FileType } from '../../types';
+import { Publication, FileType, StrapiPublication } from '../../types';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { Button } from '../UI/Button';
 import { FileText, Link as LinkIcon, Download, Search, File, ExternalLink } from 'lucide-react';
@@ -17,13 +17,24 @@ export const PublicationList: React.FC = () => {
   useEffect(() => {
     const loadPublications = async () => {
       try {
-        const data = await fetchAPI<any>('/api/publication', {
-          populate: '*',
-          locale: language
-        });
-        const flattened = flattenStrapiResponse<Publication>(data);
-        if (flattened.length > 0) {
-            setItems(flattened);
+        const data = await fetchAPI<any>('/api/publications');
+        const strapiItems = flattenStrapiResponse<StrapiPublication>(data);
+
+        if (strapiItems.length > 0) {
+           const mappedItems: Publication[] = strapiItems.map(item => {
+              const isNepali = language === 'np';
+              return {
+                  id: item.id,
+                  title: isNepali ? (item.title_np || item.title_en) : item.title_en,
+                  author: isNepali ? (item.author_np || item.author_en) : item.author_en,
+                  date: item.date,
+                  type: (item.type?.toUpperCase() as FileType) || 'LINK',
+                  url: item.external_url || '#', // In real app, this would point to media
+                  description: isNepali ? (item.description_np || item.description_en) : item.description_en,
+                  size: item.size || undefined
+              };
+           });
+           setItems(mappedItems);
         } else {
              setItems(PUBLICATIONS);
         }

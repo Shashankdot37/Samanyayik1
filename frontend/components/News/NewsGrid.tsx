@@ -1,17 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NEWS_ITEMS, TRANSLATIONS } from '../../constants';
-import { NewsCategory, NewsItem } from '../../types';
+import { NewsCategory, NewsItem, StrapiNewsItem } from '../../types';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { Button } from '../UI/Button';
 import { Modal } from '../Shared/Modal';
 import { ArrowRight, ExternalLink, Calendar, User } from 'lucide-react';
+import { fetchAPI, flattenStrapiResponse, extractTextFromBlocks } from '../../utils/api';
 
 export const NewsGrid: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
   const [activeCategory, setActiveCategory] = useState<NewsCategory | 'All'>('All');
   const [selectedItem, setSelectedItem] = useState<NewsItem | null>(null);
-  const newsItems = NEWS_ITEMS;
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(NEWS_ITEMS);
+
+  useEffect(() => {
+    const loadNews = async () => {
+        try {
+            const response = await fetchAPI<any>('/api/news');
+            const strapiItems = flattenStrapiResponse<StrapiNewsItem>(response);
+            
+            if (strapiItems.length > 0) {
+                const mappedItems: NewsItem[] = strapiItems.map(item => {
+                    const isNepali = language === 'np';
+                    // Fallback to English if Nepali content is missing/empty, or vice versa if needed
+                    // For now, simple mapping based on current language
+                    return {
+                        id: item.id,
+                        category: item.category,
+                        date: item.date,
+                        title: isNepali ? (item.title_np || item.title_en) : item.title_en,
+                        description: isNepali ? (item.description_np || item.description_en) : item.description_en,
+                        author: isNepali ? (item.author_np || item.author_en) : item.author_en,
+                        // Strapi rich text to plain text or HTML. 
+                        // For this UI, fullContent expects HTML string or plain text.
+                        // We use the helper to get simple text representation for now.
+                        fullContent: extractTextFromBlocks(isNepali ? item.content_np : item.content_en),
+                        // Image is missing in provided API response, using placeholder or handled if provided
+                        image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?auto=format&fit=crop&q=80&w=2000",
+                        externalUrl: "" // Not in provided response schema
+                    };
+                });
+                setNewsItems(mappedItems);
+            }
+        } catch (error) {
+            console.error("Failed to load news from API, falling back to static data", error);
+            // setNewsItems(NEWS_ITEMS); // Already default
+        }
+    };
+    loadNews();
+  }, [language]);
 
   const categories: (NewsCategory | 'All')[] = ['All', 'News', 'Legal Commentary', 'Blog'];
 

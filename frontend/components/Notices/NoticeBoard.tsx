@@ -1,18 +1,50 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NOTICES, NOTICES_NP, TRANSLATIONS } from '../../constants';
-import { NoticeCategory, NoticeItem } from '../../types';
+import { NoticeCategory, NoticeItem, StrapiNoticeItem } from '../../types';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { Modal } from '../Shared/Modal';
 import { Button } from '../UI/Button';
+import { fetchAPI, flattenStrapiResponse, extractTextFromBlocks } from '../../utils/api';
 import { Bell, Briefcase, Calendar, Info, FileText, Megaphone } from 'lucide-react';
 
 export const NoticeBoard: React.FC = () => {
   const { language } = useAccessibility();
   const t = TRANSLATIONS[language];
-  const items = language === 'np' ? NOTICES_NP : NOTICES;
+  // const items = language === 'np' ? NOTICES_NP : NOTICES;
+  const [items, setItems] = useState<NoticeItem[]>(language === 'np' ? NOTICES_NP : NOTICES);
+
+  useEffect(() => {
+     const loadNotices = async () => {
+         try {
+             const response = await fetchAPI<any>('/api/notices');
+             const strapiItems = flattenStrapiResponse<StrapiNoticeItem>(response);
+             
+             if (strapiItems.length > 0) {
+                 const mappedItems: NoticeItem[] = strapiItems.map(item => {
+                     const isNepali = language === 'np';
+                     return {
+                         id: item.id,
+                         category: item.category,
+                         date: item.date,
+                         title: isNepali ? (item.title_np || item.title_en) : item.title_en,
+                         excerpt: isNepali ? (item.excerpt_np || item.excerpt_en) : item.excerpt_en,
+                         // Use helper to extract text/html from blocks
+                         content: extractTextFromBlocks(isNepali ? item.content_np : item.content_en), 
+                         isUrgent: item.isUrgent
+                     };
+                 });
+                 setItems(mappedItems);
+             }
+         } catch (error) {
+             console.error("Failed to load notices from API, using static data", error);
+             setItems(language === 'np' ? NOTICES_NP : NOTICES);
+         }
+     };
+     loadNotices();
+  }, [language]);
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [selectedNotice, setSelectedNotice] = useState<NoticeItem | null>(null);
 
