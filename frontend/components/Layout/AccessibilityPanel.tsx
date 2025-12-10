@@ -143,23 +143,23 @@ export const AccessibilityPanel: React.FC = () => {
                         </h3>
                         <ShortcutItem 
                             action={language === 'np' ? 'सामग्रीमा छोड्नुहोस्' : 'Skip to Content'}
-                            keys={['Alt + 0', 'Ctrl + Opt + 0']}
+                            keys={['Alt + A', 'Ctrl + Opt + A']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'गृहपृष्ठ' : 'Home'}
-                            keys={['Alt + 1', 'Ctrl + Opt + 1']}
+                            keys={['Alt + H', 'Ctrl + Opt + H']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'हाम्रो बारेमा' : 'More About Us'}
-                            keys={['Alt + 2', 'Ctrl + Opt + 2']}
+                            keys={['Alt + M', 'Ctrl + Opt + M']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'हाम्रा सेवाहरू' : 'Our Services'}
-                            keys={['Alt + 3', 'Ctrl + Opt + 3']}
+                            keys={['Alt + S', 'Ctrl + Opt + S']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'सम्पर्क गर्नुहोस्' : 'Contact Us'}
-                            keys={['Alt + 5', 'Ctrl + Opt + 5']}
+                            keys={['Alt + U', 'Ctrl + Opt + U']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'मद्दत / प्राय: सोधिने प्रश्न' : 'Help / FAQ'}
@@ -178,7 +178,7 @@ export const AccessibilityPanel: React.FC = () => {
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'भाषा बदल्नुहोस् (EN/NP)' : 'Switch Language (EN/NP)'}
-                            keys={['Alt + G', 'Ctrl + Opt + G']}
+                            keys={['Alt + I', 'Ctrl + Opt + I']}
                         />
                         <ShortcutItem 
                             action={language === 'np' ? 'फन्ट साइज बढाउनुहोस्' : 'Increase Font Size'}

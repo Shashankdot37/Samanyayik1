@@ -8,14 +8,14 @@ interface KeyboardShortcutsModalProps {
 }
 
 const shortcuts = [
-  { key: 'Alt + 0', mac: 'Ctrl + Opt + 0', description: 'Skip to Content' },
-  { key: 'Alt + 1', mac: 'Ctrl + Opt + 1', description: 'Home' },
-  { key: 'Alt + 2', mac: 'Ctrl + Opt + 2', description: 'More About Us' },
-  { key: 'Alt + 3', mac: 'Ctrl + Opt + 3', description: 'Our Services' },
-  { key: 'Alt + 5', mac: 'Ctrl + Opt + 5', description: 'Contact Us' },
+  { key: 'Alt + A', mac: 'Ctrl + Opt + A', description: 'Skip to Content' },
+  { key: 'Alt + H', mac: 'Ctrl + Opt + H', description: 'Home' },
+  { key: 'Alt + M', mac: 'Ctrl + Opt + M', description: 'More About Us' },
+  { key: 'Alt + S', mac: 'Ctrl + Opt + S', description: 'Our Services' },
+  { key: 'Alt + U', mac: 'Ctrl + Opt + U', description: 'Contact Us' },
   { key: 'Alt + 6', mac: 'Ctrl + Opt + 6', description: 'Help / FAQ' },
   { key: 'Alt + L', mac: 'Ctrl + Opt + L', description: 'Profile / Book Appointment' },
-  { key: 'Alt + G', mac: 'Ctrl + Opt + G', description: 'Switch Language (EN/NP)' },
+  { key: 'Alt + I', mac: 'Ctrl + Opt + I', description: 'Switch Language (EN/NP)' },
   { key: 'Alt + =', mac: 'Ctrl + Opt + =', description: 'Increase Font Size' },
   { key: 'Alt + -', mac: 'Ctrl + Opt + -', description: 'Decrease Font Size' },
   { key: 'Alt + C', mac: 'Ctrl + Opt + C', description: 'Toggle High Contrast' },

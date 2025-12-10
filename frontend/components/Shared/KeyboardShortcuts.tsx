@@ -24,7 +24,7 @@ const KeyboardShortcuts: React.FC = () => {
       if (isMacShortcut || isWindowsShortcut) {
         switch (event.code) {
           // Navigation Shortcuts
-          case 'Digit0': // Skip to Content - Alt + 0 or Ctrl + Opt + 0
+          case 'KeyA': // Skip to Content - Alt + A or Ctrl + Opt + A
             event.preventDefault();
             const mainContent = document.getElementById('main-content');
             if (mainContent) {
@@ -36,19 +36,19 @@ const KeyboardShortcuts: React.FC = () => {
               }
             }
             break;
-          case 'Digit1': // Home - Alt + 1 or Ctrl + Opt + 1
+          case 'KeyH': // Home - Alt + H or Ctrl + Opt + H
             event.preventDefault();
             navigate('/');
             break;
-          case 'Digit2': // More About Us - Alt + 2 or Ctrl + Opt + 2
+          case 'KeyM': // More About Us - Alt + M or Ctrl + Opt + M
             event.preventDefault();
             navigate('/about');
             break;
-          case 'Digit3': // Our Services - Alt + 3 or Ctrl + Opt + 3
+          case 'KeyS': // Our Services - Alt + S or Ctrl + Opt + S
             event.preventDefault();
             navigate('/practice-areas');
             break;
-          case 'Digit5': // Contact Us - Alt + 5 or Ctrl + Opt + 5
+          case 'KeyU': // Contact Us - Alt + U or Ctrl + Opt + U
             event.preventDefault();
             navigate('/contact');
             break;
@@ -58,7 +58,7 @@ const KeyboardShortcuts: React.FC = () => {
             break;
             
           // Feature Shortcuts
-          case 'KeyG': // Switch Language (EN/NP) - Alt + G or Ctrl + Opt + G
+          case 'KeyI': // Switch Language (EN/NP) - Alt + I or Ctrl + Opt + I
             event.preventDefault();
             setLanguage(language === 'en' ? 'np' : 'en');
             break;
