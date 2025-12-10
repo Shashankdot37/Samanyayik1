@@ -7,6 +7,7 @@ import { Navbar } from './components/Layout/Navbar';
 import { Footer } from './components/Layout/Footer';
 import { AccessibilityPanel } from './components/Layout/AccessibilityPanel';
 import ScrollToTop from './components/Shared/ScrollToTop';
+import KeyboardShortcuts from './components/Shared/KeyboardShortcuts';
 import Home from './pages/Home';
 import Calculator from './pages/Calculator';
 import PracticeAreasPage from './pages/PracticeAreasPage';
@@ -23,12 +24,16 @@ const App: React.FC = () => {
     <AccessibilityProvider>
       <Router>
         <ScrollToTop />
-        <a href="#main-content" className="skip-link font-bold focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        <KeyboardShortcuts />
+        <a 
+          href="#main-content" 
+          className="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-secondary focus:text-white focus:rounded-lg focus:font-bold focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        >
           Skip to Content
         </a>
         <div className="min-h-screen flex flex-col bg-white transition-colors duration-300">
           <Navbar />
-          <main id="main-content" className="flex-grow">
+          <main id="main-content" tabIndex={-1} className="flex-grow">
             <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
