@@ -4,7 +4,7 @@ import { Button } from '../components/UI/Button';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import { TRANSLATIONS } from '../constants';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import { Turnstile } from '../components/Shared/Turnstile';
+ 
 
 // --- Types ---
 type Step = 1 | 2 | 3;
@@ -53,6 +53,66 @@ const BookingPage: React.FC = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [hasVoiceMessage, setHasVoiceMessage] = useState(false);
+  const RECAPTCHA_SITEKEY = import.meta.env.VITE_RECAPTCHA_SITEKEY || '';
+  const [isRecaptchaLoaded, setIsRecaptchaLoaded] = useState(false);
+
+  const executeRecaptcha = async (): Promise<string | null> => {
+    const g: any = (window as any).grecaptcha;
+    if (!g || !RECAPTCHA_SITEKEY) return null;
+    await new Promise<void>((resolve) => g.ready(resolve));
+    try {
+      const token = await g.execute(RECAPTCHA_SITEKEY, { action: 'booking' });
+      return token;
+    } catch {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    if (currentStep !== 3) return;
+    if (!RECAPTCHA_SITEKEY) return;
+    const g: any = (window as any).grecaptcha;
+    if (g && typeof g.execute === 'function') {
+      setIsRecaptchaLoaded(true);
+      g.ready(() => {
+        g.execute(RECAPTCHA_SITEKEY, { action: 'booking' })
+          .then((token: string) => {
+            setCaptchaToken(token);
+            if ((errors as any).isHuman) setErrors({ ...errors, isHuman: undefined } as any);
+          })
+          .catch(() => {
+            setCaptchaToken(null);
+            setErrors({ ...errors, isHuman: 'CAPTCHA verification failed. Please try again.' } as any);
+          });
+      });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITEKEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      setIsRecaptchaLoaded(true);
+      const gg: any = (window as any).grecaptcha;
+      if (!gg) return;
+      gg.ready(() => {
+        gg.execute(RECAPTCHA_SITEKEY, { action: 'booking' })
+          .then((token: string) => {
+            setCaptchaToken(token);
+            if ((errors as any).isHuman) setErrors({ ...errors, isHuman: undefined } as any);
+          })
+          .catch(() => {
+            setCaptchaToken(null);
+            setErrors({ ...errors, isHuman: 'CAPTCHA verification failed. Please try again.' } as any);
+          });
+      });
+    };
+    script.onerror = () => {
+      setCaptchaToken(null);
+      setErrors({ ...errors, isHuman: 'Failed to load reCAPTCHA. Please try again.' } as any);
+    };
+    document.head.appendChild(script);
+  }, [currentStep, RECAPTCHA_SITEKEY]);
 
   // Calendar Logic
   const today = new Date();
@@ -102,6 +162,7 @@ const BookingPage: React.FC = () => {
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [mimeType, setMimeType] = useState<string>('audio/webm');
+  const [fileExtension, setFileExtension] = useState<string>('webm');
 
   const toggleRecording = async () => {
     if (isRecording) {
@@ -120,8 +181,9 @@ const BookingPage: React.FC = () => {
         } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
             selectedMimeType = 'audio/mp4'; // Safari
         }
-        
+
         setMimeType(selectedMimeType);
+        setFileExtension(selectedMimeType.includes('mp4') ? 'mp4' : 'webm');
         const recorder = new MediaRecorder(stream, { mimeType: selectedMimeType });
         const chunks: Blob[] = [];
 
@@ -152,37 +214,15 @@ const BookingPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const latestToken = await executeRecaptcha();
+    setCaptchaToken(latestToken);
+    if (!latestToken) {
+      setErrors({ ...errors, isHuman: 'Please complete the human verification' } as any);
+      return;
+    }
     if (validateForm() && selectedDate && selectedTime) {
       try {
         let voiceMessageId = null;
-
-        // Step 1: Upload Voice Message (if exists)
-        if (audioBlob) {
-            const uploadData = new FormData();
-            // Using .wav extension to bypass strict validation if needed
-            // Strapi /api/upload expects 'files' key
-            uploadData.append('files', audioBlob, 'voice_message.wav'); 
-
-            const uploadResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:1337'}/api/upload`, {
-                method: 'POST',
-                body: uploadData,
-            });
-
-            if (!uploadResponse.ok) {
-                const uploadError = await uploadResponse.json();
-                console.error("Upload Error:", uploadError);
-                throw new Error(`Voice message upload failed: ${uploadError.error?.message || uploadResponse.statusText}`);
-            }
-
-            const uploadResult = await uploadResponse.json();
-            // Strapi returns an array of files for the upload endpoint
-            if (Array.isArray(uploadResult) && uploadResult.length > 0) {
-                voiceMessageId = uploadResult[0].id;
-            } else {
-                 // Fallback if structure is different
-                 voiceMessageId = uploadResult.id; 
-            }
-        }
 
         // Step 2: Create Appointment (JSON)
         const requestData: any = {
@@ -197,9 +237,23 @@ const BookingPage: React.FC = () => {
           issue: form.issue ? [{ type: 'paragraph', children: [{ type: 'text', text: form.issue }] }] : null,
         };
 
-        // Attach the media relationship
-        if (voiceMessageId) {
-            requestData.voiceMessage = voiceMessageId;
+        if (audioBlob) {
+          const toBase64 = (blob: Blob) => new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const res = reader.result as string;
+              const b64 = res.split(',')[1] || res;
+              resolve(b64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+          const base64 = await toBase64(audioBlob);
+          requestData.voiceMessageFile = {
+            filename: `voice_message.${fileExtension}`,
+            mime: mimeType,
+            base64
+          };
         }
 
         const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:1337'}/api/appointments`, {
@@ -209,7 +263,7 @@ const BookingPage: React.FC = () => {
           },
           body: JSON.stringify({ 
             data: requestData,
-            captchaToken: captchaToken 
+            captchaToken: latestToken 
           }),
         });
 
@@ -537,30 +591,10 @@ const BookingPage: React.FC = () => {
                       {errors.issue && <p className="text-red-500 text-xs mt-1 font-bold">{errors.issue}</p>}
                    </div>
 
-                   {/* Turnstile CAPTCHA */}
                    <div className="py-4">
                       <label className={`block text-sm font-bold mb-3 ${highContrast ? 'text-yellow-400' : 'text-black'}`}>
                           {t.humanVerify} <span className="text-red-500">*</span>
                       </label>
-                      <Turnstile
-                          siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || ''}
-                          onSuccess={(token) => {
-                              setCaptchaToken(token);
-                              // Clear error if it exists
-                              if (errors.isHuman) {
-                                  setErrors({ ...errors, isHuman: undefined });
-                              }
-                          }}
-                          onError={() => {
-                              setCaptchaToken(null);
-                              setErrors({ ...errors, isHuman: 'CAPTCHA verification failed. Please try again.' });
-                          }}
-                          onExpire={() => {
-                              setCaptchaToken(null);
-                              setErrors({ ...errors, isHuman: 'CAPTCHA expired. Please verify again.' });
-                          }}
-                          theme={highContrast ? 'dark' : 'auto'}
-                      />
                       {errors.isHuman && <p className="text-red-500 text-xs mt-2 font-bold">{errors.isHuman}</p>}
                    </div>
 
