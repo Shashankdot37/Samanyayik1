@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, CheckCircle, Mic, MapPin, ChevronLeft, ChevronRight, AlertCircle } from 'lucide-react';
 import { Button } from '../components/UI/Button';
-import { Captcha } from '../components/Shared/Captcha';
 import { useAccessibility } from '../contexts/AccessibilityContext';
 import { TRANSLATIONS } from '../constants';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { Turnstile } from '../components/Shared/Turnstile';
 
 // --- Types ---
 type Step = 1 | 2 | 3;
@@ -14,7 +14,6 @@ interface BookingForm {
   email: string;
   address: string;
   issue: string;
-  isHuman: boolean;
   coordinates?: [number, number];
   consultationType: 'online' | 'offline';
 }
@@ -48,12 +47,11 @@ const BookingPage: React.FC = () => {
     email: '',
     address: '',
     issue: '',
-    isHuman: false,
     consultationType: 'offline' // Default
   });
   const [errors, setErrors] = useState<Partial<Record<keyof BookingForm, string>>>({});
   const [isSuccess, setIsSuccess] = useState(false);
-  const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [hasVoiceMessage, setHasVoiceMessage] = useState(false);
 
   // Calendar Logic
@@ -92,7 +90,9 @@ const BookingPage: React.FC = () => {
         newErrors.issue = "Either description or voice message is required";
     }
 
-    if (!isCaptchaVerified) newErrors.isHuman = "Please complete the human verification";
+    if (!captchaToken) {
+        newErrors.isHuman = "Please complete the human verification";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -207,7 +207,10 @@ const BookingPage: React.FC = () => {
           headers: {
               'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ data: requestData }),
+          body: JSON.stringify({ 
+            data: requestData,
+            captchaToken: captchaToken 
+          }),
         });
 
         if (!response.ok) {
@@ -534,10 +537,31 @@ const BookingPage: React.FC = () => {
                       {errors.issue && <p className="text-red-500 text-xs mt-1 font-bold">{errors.issue}</p>}
                    </div>
 
-                   {/* Verification */}
-                   <div className="space-y-2">
-                      <Captcha highContrast={highContrast} onVerify={setIsCaptchaVerified} />
-                      {errors.isHuman && <p className="text-red-500 text-xs font-bold">{errors.isHuman}</p>}
+                   {/* Turnstile CAPTCHA */}
+                   <div className="py-4">
+                      <label className={`block text-sm font-bold mb-3 ${highContrast ? 'text-yellow-400' : 'text-black'}`}>
+                          {t.humanVerify} <span className="text-red-500">*</span>
+                      </label>
+                      <Turnstile
+                          siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY || ''}
+                          onSuccess={(token) => {
+                              setCaptchaToken(token);
+                              // Clear error if it exists
+                              if (errors.isHuman) {
+                                  setErrors({ ...errors, isHuman: undefined });
+                              }
+                          }}
+                          onError={() => {
+                              setCaptchaToken(null);
+                              setErrors({ ...errors, isHuman: 'CAPTCHA verification failed. Please try again.' });
+                          }}
+                          onExpire={() => {
+                              setCaptchaToken(null);
+                              setErrors({ ...errors, isHuman: 'CAPTCHA expired. Please verify again.' });
+                          }}
+                          theme={highContrast ? 'dark' : 'auto'}
+                      />
+                      {errors.isHuman && <p className="text-red-500 text-xs mt-2 font-bold">{errors.isHuman}</p>}
                    </div>
 
                    <div className="flex justify-between pt-6">
@@ -546,8 +570,8 @@ const BookingPage: React.FC = () => {
                       </Button>
                       <Button 
                         type="submit" 
-                        disabled={!isCaptchaVerified}
-                        className={`px-8 ${!isCaptchaVerified ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-secondary hover:bg-green-800'} text-white`}
+                        disabled={!captchaToken}
+                        className={`px-8 ${!captchaToken ? 'opacity-50 cursor-not-allowed bg-gray-400' : 'bg-secondary hover:bg-green-800'} text-white`}
                       >
                           {t.submitBooking}
                       </Button>
